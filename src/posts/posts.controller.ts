@@ -14,7 +14,6 @@ import {
   ApiProperty,
   ApiTags,
 } from '@nestjs/swagger';
-import {} from '@prisma/client';
 
 class createPostDto {
   @ApiProperty({ description: '标题' })
@@ -22,20 +21,15 @@ class createPostDto {
   @ApiProperty({ description: '内容' })
   content: string;
 }
-
+import { PrismaClient } from '@prisma/client';
 @Controller('posts')
-@ApiTags('文章接口')
+@ApiTags('博客相关接口')
 export class PostsController {
+  prisma = new PrismaClient();
   @Get()
   @ApiOperation({ summary: '博客列表' })
-  index() {
-    return [
-      {
-        id: 1,
-        title: 'Post title',
-        body: 'Post body',
-      },
-    ];
+  async index() {
+    return await this.prisma.post.findMany();
   }
 
   @Post()
