@@ -22,6 +22,7 @@ class createPostDto {
   content: string;
 }
 import { PrismaClient } from '@prisma/client';
+
 @Controller('posts')
 @ApiTags('博客相关接口')
 export class PostsController {
