@@ -14,6 +14,8 @@ import {
   ApiProperty,
   ApiTags,
 } from '@nestjs/swagger';
+import { PrismaClient } from '@prisma/client';
+import internal from 'stream';
 
 class createPostDto {
   @ApiProperty({ description: '标题' })
@@ -21,17 +23,27 @@ class createPostDto {
   @ApiProperty({ description: '内容' })
   content: string;
 }
-import { PrismaClient } from '@prisma/client';
 
 @Controller('posts')
 @ApiTags('博客相关接口')
 export class PostsController {
   prisma = new PrismaClient();
-
   @Get()
-  @ApiOperation({ summary: '博客列表' })
+  @ApiOperation({ summary: '博客首页' })
   async index() {
-    return await this.prisma.post.findMany();
+    return await this.prisma.post.findMany({
+      skip: 0,
+      take: 10,
+    });
+  }
+
+  @Get('/:page&:pagesize')
+  @ApiOperation({ summary: '博客列表' })
+  async list(@Param('page') page: number, @Param('pagesize') pagesize: number) {
+    return await this.prisma.post.findMany({
+      skip: pagesize * (page - 1),
+      take: Number(pagesize),
+    });
   }
 
   @Post()
@@ -47,7 +59,7 @@ export class PostsController {
     return 'success';
   }
 
-  @Get('/:id')
+  @Get(':id')
   @ApiOperation({ summary: '获取一篇博客的详情' })
   async details(@Param('id') id: string) {
     const details = await this.prisma.post.findUnique({
