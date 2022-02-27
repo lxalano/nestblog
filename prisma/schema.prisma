@@ -25,5 +25,32 @@ model Post {
   updatedAt DateTime @updatedAt
   viewCount Int     @default(0)
   authorId  Int?
+  categoryID  Int?
+  tagID  Int?
+  CommentID  Int?
   author    User?   @relation(fields: [authorId], references: [id])
+  category  Category? @relation(fields: [categoryID], references: [id])
+  tag Tag? @relation(fields: [tagID], references: [id])
+  comments Comment[]
+}
+
+//创建分类模型
+model Category {
+  id Int @id @default(autoincrement())
+  name String?
+  posts Post[]
+}
+
+//创建一个标签模型
+model Tag {
+  id Int @id @default(autoincrement())
+  name String?
+  posts Post[]
+}
+//创建评论模型
+model Comment {
+  id Int @id @default(autoincrement())
+  content String?
+  postID Int?
+  post Post? @relation(fields: [postID], references: [id])
 }

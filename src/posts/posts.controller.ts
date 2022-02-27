@@ -28,6 +28,7 @@ class createPostDto {
 @ApiTags('博客相关接口')
 export class PostsController {
   prisma = new PrismaClient();
+
   @Get()
   @ApiOperation({ summary: '博客首页' })
   async index() {
@@ -61,7 +62,7 @@ export class PostsController {
 
   @Get(':id')
   @ApiOperation({ summary: '获取一篇博客的详情' })
-  async details(@Param('id') id: string) {
+  async details(@Param('id') id: number) {
     const details = await this.prisma.post.findUnique({
       where: {
         id: Number(id),
@@ -95,5 +96,35 @@ export class PostsController {
       },
     });
     return 'delete success';
+  }
+  // 获取评论接口
+  @Get('/:id/comments')
+  @ApiOperation({ summary: '获取一篇博客的评论' })
+  async comments(@Param('id') id: string) {
+    const comments = await this.prisma.comment.findMany({
+      where: {
+        post: {
+          id: Number(id),
+        },
+      },
+    });
+    return comments;
+  }
+  //发布评论接口
+  @Post('/:id/comments')
+  @ApiOperation({ summary: '发布一篇博客的评论' })
+  async createComment(@Param('id') id: string, @Body() body: any) {
+    const { content } = body;
+    const create = await this.prisma.comment.create({
+      data: {
+        content,
+        post: {
+          connect: {
+            id: Number(id),
+          },
+        },
+      },
+    });
+    return 'success';
   }
 }
